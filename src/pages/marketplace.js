@@ -15,28 +15,7 @@ export const Marketplace = () => {
   const [availability, setAvail] = React.useState("in-stock")
   const [numOfStock, setNumOfStock] = React.useState("")
 
-//   const createListing = (title,
-//     price,
-//     description,
-//     condition,
-//     availability,
-//     numOfStock) => {
-//     const newListing = [...listings, {
-//         "title":title,
-//         "price":price,
-//         "description":description,
-//         "condition":condition,
-//         "availability":availability,
-//         "numOfStock":numOfStock
-//     }];
-//     setListings(newListing);
-//     setTitle("");
-//     setPrice("");
-//     setDescription("");
-//     setCondition("");
-//     setAvail("");
-//     setNumOfStock("");
-//   }
+const loadItems = () => marketItems().then((data) => setListings(data)) 
 
 const createListing = (data) =>
     fetch("https://ecomm-service.herokuapp.com/marketplace", {
@@ -59,7 +38,7 @@ onSubmit={(ev) => {
         condition,
         availability,
         numOfStock: Number(numOfStock)
-    })
+    }).then(() => loadItems());
 }}>
   <div className="p-3">New Listing</div>
   <div className="space-y-5 p-3">
@@ -67,25 +46,25 @@ onSubmit={(ev) => {
       <label htmlFor="title" className="block text-sm font-medium">
         Title
       </label>
-      <input type="text" id="title" value={title} onChange={(ev)=>setTitle(ev.target.value)}/>
+      <input type="text" id="title" value={title} onChange={(ev)=>setTitle(ev.target.value)} required/>
     </div>
     <div>
       <label htmlFor="price" className="block text-sm font-medium">
         Price
       </label>
-      <input type="number" id="price" value={price} onChange={(ev)=>setPrice(ev.target.value)}/>
+      <input type="number" id="price" value={price} onChange={(ev)=>setPrice(ev.target.value)} required/>
     </div>
     <div>
       <label htmlFor="description" className="block text-sm font-medium">
         Description
       </label>
-      <textarea id="description" value={description} onChange={(ev)=>setDescription(ev.target.value)}/>
+      <textarea id="description" value={description} onChange={(ev)=>setDescription(ev.target.value)} required/>
     </div>
     <div>
       <label htmlFor="condition" className="block text-sm font-medium">
         Condition
       </label>
-      <select id="condition"value={condition} onChange={(ev)=>setCondition(ev.target.value)}>
+      <select id="condition"value={condition} onChange={(ev)=>setCondition(ev.target.value)} required>
         <option value="new">New</option>
         <option value="used_like-new">Used (like new)</option>
         <option value="used_good">Used (good)</option>
@@ -96,7 +75,7 @@ onSubmit={(ev) => {
       <label htmlFor="availability" className="block text-sm font-medium">
         Availability
       </label>
-      <select id="availability"value={availability} onChange={(ev)=>setAvail(ev.target.value)}>
+      <select id="availability"value={availability} onChange={(ev)=>setAvail(ev.target.value)} required>
         <option value="in-stock">In Stock</option>
         <option value="single-item">Single Item</option>
       </select>
@@ -105,7 +84,7 @@ onSubmit={(ev) => {
       <label htmlFor="numOfStock" className="block text-sm font-medium">
         Number of Available Stock
       </label>
-      <input type="number" id="numOfStock" value={numOfStock} onChange={(ev)=>setNumOfStock(ev.target.value)}/>
+      <input type="number" id="numOfStock" value={numOfStock} onChange={(ev)=>setNumOfStock(ev.target.value)} required/>
     </div>
     <div>
       <button>ADD</button>
@@ -127,7 +106,7 @@ onSubmit={(ev) => {
         />
       )) : null}
       {/* {listings? <h1>yes</h1> : <h2>NO</h2>} */}
-      <button onClick={() => {marketItems().then((data) => setListings(data));}}>CLICK TO LOAD ITEMS</button>
+      <button onClick={() => {marketItems().then(() => loadItems());}}>CLICK TO LOAD ITEMS</button>
     {/* </div> */}
     {/* </div> */}
   </div>);
