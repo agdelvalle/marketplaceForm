@@ -1,8 +1,9 @@
 import * as React from "react";
 import { ListingItem } from "../listing-item";
 
-const marketItems = () => 
-    fetch("https://ecomm-service.herokuapp.com/marketplace")
+const marketItems = (page, signal) => 
+    // fetch("https://ecomm-service.herokuapp.com/marketplace")
+    fetch(`https://ecomm-service.herokuapp.com/marketplace?page=${page}&limit=3`, {signal})
     .then((res) => res.json())
 
 export const Marketplace = () => {
@@ -14,8 +15,9 @@ export const Marketplace = () => {
   const [condition, setCondition] = React.useState("new")
   const [availability, setAvail] = React.useState("in-stock")
   const [numOfStock, setNumOfStock] = React.useState("")
+  const [page, setPage] = React.useState(1)
 
-const loadItems = () => marketItems().then((data) => setListings(data)) 
+const loadItems = (page) => marketItems(page).then((data) => setListings(data)) 
 
 const createListing = (data) =>
     fetch("https://ecomm-service.herokuapp.com/marketplace", {
@@ -25,6 +27,14 @@ const createListing = (data) =>
             "Content-Type": "application/json"
         },
     }).then((res) => res.json())
+
+React.useEffect(() => {
+  const ab = new AbortController();
+  loadItems(page, ab.signal);
+  return () => {
+    ab.abort()
+  };
+}, [page])
 
   return (<div>
 {/* MARKET FORM */}
@@ -87,7 +97,27 @@ onSubmit={(ev) => {
       <input type="number" id="numOfStock" value={numOfStock} onChange={(ev)=>setNumOfStock(ev.target.value)} required/>
     </div>
     <div>
-      <button>ADD</button>
+      <button type="button"
+      className="
+              js-edit-btn
+              inline-flex
+              justify-center
+              items-center
+              py-2
+              px-4
+              border border-transparent
+              shadow-sm
+              text-sm
+              font-medium
+              rounded-md
+              text-white
+              bg-pink-600
+              hover:bg-pink-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-offset-2
+              focus:ring-pink-500
+            ">ADD</button>
     </div>
   </div>
 </form>
@@ -104,9 +134,58 @@ onSubmit={(ev) => {
           condition={item.condition}
           key={item._id}
         />
-      )) : null}
+      ))
+      : <button onClick={() => {marketItems().then(() => loadItems());}}>CLICK TO LOAD ITEMS</button>}
+{/* previous button */}
+      <button type="button"
+     className="
+     js-delete-btn
+      inline-flex
+      justify-center
+      items-center
+      py-2
+      px-4
+      border border-pink-500
+      shadow-sm
+      text-sm
+      font-medium
+      rounded-md
+      text-pink-500
+      bg-white
+      hover:text-pink-700
+      focus:outline-none
+      focus:ring-2
+      focus:ring-offset-2
+      focus:ring-pink-500
+   "
+      disabled={page === 1}
+      onClick={() => {setPage(page - 1)
+      console.log(page)}}>PREVIOUS</button>
+{/* next button */}
+      <button type="button"
+      className="
+        js-delete-btn
+        inline-flex
+        justify-center
+        items-center
+        py-2
+        px-4
+        border border-pink-500
+        shadow-sm
+        text-sm
+        font-medium
+        rounded-md
+        text-pink-500
+        bg-white
+        hover:text-pink-700
+        focus:outline-none
+        focus:ring-2
+        focus:ring-offset-2
+        focus:ring-pink-500
+    "
+      onClick={() => {setPage(Number(page) + 1)
+      console.log(page)}}>NEXT</button>
       {/* {listings? <h1>yes</h1> : <h2>NO</h2>} */}
-      <button onClick={() => {marketItems().then(() => loadItems());}}>CLICK TO LOAD ITEMS</button>
     {/* </div> */}
     {/* </div> */}
   </div>);
